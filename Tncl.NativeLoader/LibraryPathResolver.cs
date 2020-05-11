@@ -37,7 +37,7 @@ namespace Tncl.NativeLoader
             var result = 
                 from baseDirectory in baseDirectories
                 let fullPath = Path.Combine(baseDirectory, name)
-                where !File.Exists(fullPath)
+                where File.Exists(fullPath)
                 select fullPath;
 
             return result;
