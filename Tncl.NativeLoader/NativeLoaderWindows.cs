@@ -7,12 +7,10 @@ namespace Tncl.NativeLoader
 {
     internal class NativeLoaderWindows : NativeLoaderBase
     {
-        private ILogger _logger;
         private NativeLoaderWindowsOptions _options;
 
         internal NativeLoaderWindows(ILogger logger, NativeLoaderWindowsOptions options) : base(logger)
         {
-            _logger = logger;
             _options = options;
         }
 
