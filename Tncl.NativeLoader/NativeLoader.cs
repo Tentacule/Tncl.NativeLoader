@@ -13,6 +13,8 @@ namespace Tncl.NativeLoader
         private readonly Platform _platform;
         private readonly ILogger _logger;
 
+        public NativeLoaderWindowsOptions WindowsOptions { get; } = new NativeLoaderWindowsOptions();
+
         public NativeLoader() : this(null)
         {
 
@@ -23,11 +25,11 @@ namespace Tncl.NativeLoader
             _logger = logger;
             _logger?.LogDebug($"{nameof(NativeLoader)} - Detected platform: {RuntimeInformation.OSDescription}.");
             _platform = OSUtilities.GetOsPlatform();
-            
+
             switch (_platform)
             {
                 case Platform.Windows:
-                    _loader = new NativeLoaderWindows(_logger);
+                    _loader = new NativeLoaderWindows(_logger, WindowsOptions);
                     break;
                 case Platform.Linux:
                     _loader = new NativeLoaderUnix(_logger);
@@ -50,7 +52,7 @@ namespace Tncl.NativeLoader
         public IntPtr Load(LibraryItem library, ILibraryPathResolver libraryPathResolver = null)
         {
             if (library == null)
-                throw  new ArgumentNullException(nameof(library));
+                throw new ArgumentNullException(nameof(library));
 
             var name = library.Name;
             var version = library.Version;
@@ -130,6 +132,18 @@ namespace Tncl.NativeLoader
             {
                 _logger?.LogDebug($"FreeLibrary for '{fileName}' failed.");
                 return false;
+            }
+        }
+
+        public void FreeAll()
+        {
+            var keys = _loadedLibrairies.Keys.ToList();
+            foreach (var key in keys)
+            {
+                if (_loader.Free(_loadedLibrairies[key]))
+                {
+                    _loadedLibrairies.Remove(key);
+                }
             }
         }
 
