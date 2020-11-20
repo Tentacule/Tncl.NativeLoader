@@ -15,7 +15,13 @@ namespace Tncl.NativeLoader
         public static T CreateInstance<T>(this global::Tncl.NativeLoader.NativeLoader loader) where T : class
         {
             var interfaceType = typeof(T);
-            if (!typeof(T).IsInterface && !interfaceType.IsPublic)
+
+            return (T)CreateInstance(loader, interfaceType);
+        }
+        
+        public static object CreateInstance(this global::Tncl.NativeLoader.NativeLoader loader, Type interfaceType)
+        {
+            if (!interfaceType.IsInterface && !interfaceType.IsPublic)
                 throw new Exception($"{interfaceType.Name} is not a public interface.");
 
             var assemblyName = $"Assembly.{interfaceType.Name}";
@@ -30,7 +36,7 @@ namespace Tncl.NativeLoader
             typeBuilder.DefineConstructor(interfaceMethods);
 
             var implementationType = typeBuilder.CreateTypeInfo();
-            return (T)Activator.CreateInstance(implementationType, loader);
+            return Activator.CreateInstance(implementationType, loader);
         }
 
         private static IList<InterfaceMethodDefinition> GetInterfaceMethodDefinitions(Type interfaceType, ModuleBuilder moduleBuilder, TypeBuilder typeBuilder)
