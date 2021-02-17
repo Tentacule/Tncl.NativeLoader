@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 
 namespace Tncl.NativeLoader
@@ -14,37 +15,20 @@ namespace Tncl.NativeLoader
 
         internal IntPtr Load(string fileName)
         {
-            var libraryHandle = IntPtr.Zero;
-
-            try
-            {
-                libraryHandle = PlatformLoadLibrary(fileName);
-            }
-            catch (Exception e)
-            {
-                _logger.LogDebug($"Failed to load {fileName}", e);
-            }
-
-            return libraryHandle;
+            return NativeLibrary.Load(fileName);
         }
 
-        internal bool Free(IntPtr handle)
+        internal void Free(IntPtr handle)
         {
-            return PlatformFreeLibrary(handle);
+            NativeLibrary.Free(handle);
         }
 
-        internal IntPtr GetProcAddress(IntPtr libraryHandle, string functionName)
+        internal IntPtr GetProcAddress(IntPtr handle, string name)
         {
-            return PlatformGetProcAddress(libraryHandle, functionName);
+            return NativeLibrary.GetExport(handle, name);
         }
 
         internal abstract string GetOSLibraryName(string fileName, string version);
-
-        protected abstract IntPtr PlatformLoadLibrary(string fileName);
-
-        protected abstract bool PlatformFreeLibrary(IntPtr handle);
-
-        protected abstract IntPtr PlatformGetProcAddress(IntPtr handle, string functionName);
 
     }
 }

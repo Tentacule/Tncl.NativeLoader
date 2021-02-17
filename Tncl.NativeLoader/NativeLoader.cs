@@ -122,17 +122,11 @@ namespace Tncl.NativeLoader
                 _logger?.LogDebug($"'{fileName}' was not loaded.");
                 return false;
             }
-            if (_loader.Free(_loadedLibrairies[fileName]))
-            {
-                _loadedLibrairies.Remove(fileName);
-                _logger?.LogDebug($"FreeLibrary for '{fileName}' done.");
-                return true;
-            }
-            else
-            {
-                _logger?.LogDebug($"FreeLibrary for '{fileName}' failed.");
-                return false;
-            }
+            
+            _loader.Free(_loadedLibrairies[fileName]);
+            _loadedLibrairies.Remove(fileName);
+            _logger?.LogDebug($"FreeLibrary for '{fileName}' done.");
+            return true;
         }
 
         public void FreeAll()
@@ -140,10 +134,8 @@ namespace Tncl.NativeLoader
             var keys = _loadedLibrairies.Keys.ToList();
             foreach (var key in keys)
             {
-                if (_loader.Free(_loadedLibrairies[key]))
-                {
-                    _loadedLibrairies.Remove(key);
-                }
+                _loader.Free(_loadedLibrairies[key]);
+                _loadedLibrairies.Remove(key);
             }
         }
 
